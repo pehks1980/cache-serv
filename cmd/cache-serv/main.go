@@ -17,8 +17,6 @@ import (
 	// репозиторий (хранилище) 1 файло 2 память 3 pg sql(db)
 	"github.com/pehks1980/cache-serv/internal/pkg/repository"
 
-	//"github.com/pehks1980/cache-serv/internal/pkg/model"
-
 )
 
 
@@ -41,11 +39,9 @@ func main() {
 	repoif = repoif.New(*storageName)
 
 	// инициализация сервиса - 'сцепление' с файловым хранилищем
-	// через интерфейс :
-	// в итоге svc хранит методы и данные структуры файлового хранилища file.go Put Get
 	queueSVC := service.New(repoif)
 	//создание сервера с таким портом, и обработчиком интерфейс которого связывается а файлохранилищем
-	// т.к. инициализация происходит (RegisterPublicHTTP)- в интерфейс endpoint подаетмя структура из file.go
+
 	serv := http.Server{
 		Addr:    net.JoinHostPort("", *port),
 		Handler: endpoint.RegisterPublicHTTP(queueSVC),
@@ -60,7 +56,7 @@ func main() {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 
-	log.Print("Started app")
+	log.Printf("Started app at :%s",*port)
 	// ждет сигнала
 	sig := <-interrupt
 
