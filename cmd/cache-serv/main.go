@@ -26,7 +26,7 @@ func main() {
 	log.Print("Starting the cache-serv")
 	// настройка порта, настроек хранилища, таймаут при закрытии сервиса
 	port := flag.String("port", "8000", "Port")
-	storageName := flag.String("storage", "storage.json", "data storage")
+	//storageName := flag.String("storage", "storage.json", "data storage")
 	shutdownTimeout := flag.Int64("shutdown_timeout", 3, "shutdown timeout")
 	// инициализация файлового хранилища ук на структуру repo
 	var repoif repository.RepoIf
@@ -36,11 +36,17 @@ func main() {
 	//repoif = new(repository.PgRepo)
 	
 	// вызов доп метода интерфейса - инициализация
-	repoif = repoif.New(*storageName)
+	config := `{"defexpiry": "10"}`
+
+	repoif = repoif.New(config)
 
 	// инициализация сервиса - 'сцепление' с файловым хранилищем
 	queueSVC := service.New(repoif)
 	//создание сервера с таким портом, и обработчиком интерфейс которого связывается а файлохранилищем
+	ctx, cancel := context.WithCancel(context.Background())
+	
+	//
+	queueSVC.Vacuum(ctx)
 
 	serv := http.Server{
 		Addr:    net.JoinHostPort("", *port),
@@ -58,11 +64,19 @@ func main() {
 
 	log.Printf("Started app at :%s",*port)
 	// ждет сигнала
+	//time.Sleep(time.Duration(1) * time.Second)
+	//cancel()
+
 	sig := <-interrupt
+	//stop vacuum
+	cancel()
+
+	ctx, cancel = context.WithTimeout(context.Background(), time.Duration(*shutdownTimeout)*time.Second)
 
 	log.Printf("Sig: %v, stopping app", sig)
 	// шат даун по контексту с тайм аутом
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*shutdownTimeout)*time.Second)
+	
+	
 	defer cancel()
 	if err := serv.Shutdown(ctx); err != nil {
 		log.Printf("shutdown err: %v", err)

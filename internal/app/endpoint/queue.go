@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/pehks1980/cache-serv/internal/pkg/model"
@@ -42,18 +43,26 @@ func putToQueue(queueSvc queueSvc) http.HandlerFunc {
 			return
 		}
 
-		if item.Value == "" {
+		/* if item.Value == "" {
 			w.WriteHeader(http.StatusBadRequest)
 			return
-		}
+		} */
 
 		err = queueSvc.Put(&item)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
+		err = json.NewEncoder(w).Encode(&item)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		log.Printf("put: %v \n", item);
+
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
+		
 	}
 }
 // вьюха для get
@@ -79,8 +88,6 @@ func getFromQueue(queueSvc queueSvc) http.HandlerFunc {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-
-		w.Header().Set("Content-Type", "application/json")
 		
 		err = json.NewEncoder(w).Encode(value)
 		if err != nil {
@@ -88,6 +95,6 @@ func getFromQueue(queueSvc queueSvc) http.HandlerFunc {
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
+		log.Printf("get: %v \n", value);
 	}
 }
