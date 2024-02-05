@@ -6,7 +6,8 @@ type (
 	}
 
 	PutValueReq struct {
-		Key   string `json:"key"`
-		Value string `json:"value"`
+		Key   	string `json:"key"`
+		Value	string `json:"value"`
+		Expiry 	string `json:"expiry"`
 	}
 )

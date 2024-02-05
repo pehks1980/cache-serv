@@ -59,7 +59,7 @@ func putToQueue(queueSvc queueSvc) http.HandlerFunc {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		log.Printf("put: %v \n", item);
+		log.Printf("put: key %v = %v exp: %v \n", item.Key, item.Value, item.Expiry);
 
 		w.Header().Set("Content-Type", "application/json")
 		
@@ -95,6 +95,6 @@ func getFromQueue(queueSvc queueSvc) http.HandlerFunc {
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		log.Printf("get: %v \n", value);
+		log.Printf("get: key %v = %v \n", req, value);
 	}
 }

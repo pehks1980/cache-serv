@@ -65,11 +65,8 @@ func (mr *MemRepo) New (config string) RepoIf{
 		items: make(map[string]item),
 	}
 
-	//durationStr := "5s"
-
 	// Parse the string into a time.Duration
 	d,_ := strconv.Atoi(myData.DefExpiry)
-
 	duration := time.Duration(d) * time.Second
 	
 	fmt.Printf("config expiry time %v\n", duration)
@@ -92,11 +89,28 @@ func (mr *MemRepo) Get(getReq string) (string, error) {
 }
 
 func (mr *MemRepo) Put(putReq *model.PutValue) error {
-	
+
 	mr.RWMutex.Lock()
+
+	var expire int64 = 0
+
+	if (putReq.Expiry == "-1") {
+		expire = time.Now().Add(mr.defaultExpiration).UnixNano()
+	}
+
+	if (putReq.Expiry != "0" ) {
+		d,_ := strconv.Atoi(putReq.Expiry)
+		duration := time.Duration(d) * time.Second
+		expire = time.Now().Add(duration).UnixNano()
+	} 
+
+
 	var lItem = &item{
 		item: putReq.Value,
-		Expiration: time.Now().Add(mr.defaultExpiration).UnixNano(),
+		//int64 from api string: 
+		// '0'-no expiry '-1'-default expiry from config 
+		// 'n'-number of seconds
+		Expiration: expire,
 	}
 	mr.Cache.items[putReq.Key] = *lItem
 	mr.RWMutex.Unlock()

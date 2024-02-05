@@ -27,14 +27,13 @@ func main() {
 	// настройка порта, настроек хранилища, таймаут при закрытии сервиса
 	port := flag.String("port", "8000", "Port")
 	//storageName := flag.String("storage", "storage.json", "data storage")
-	shutdownTimeout := flag.Int64("shutdown_timeout", 3, "shutdown timeout")
+	shutdownTimeout := flag.Int64("shutdown_timeout", 10, "shutdown timeout")
 	// инициализация файлового хранилища ук на структуру repo
 	var repoif repository.RepoIf
 	// подстановка в интерфейс соотвествующего хранилища
 	//repoif = new(repository.FileRepo)
 	repoif = new(repository.MemRepo)
 	//repoif = new(repository.PgRepo)
-	
 	// вызов доп метода интерфейса - инициализация
 	config := `{"defexpiry": "10"}`
 
