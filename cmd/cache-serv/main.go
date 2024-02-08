@@ -35,7 +35,7 @@ func main() {
 	repoif = new(repository.MemRepo)
 	//repoif = new(repository.PgRepo)
 	// вызов доп метода интерфейса - инициализация
-	config := `{"defexpiry": "10"}`
+	config := `{"defexpiry": "15"}`
 
 	repoif = repoif.New(config)
 

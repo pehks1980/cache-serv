@@ -96,14 +96,12 @@ func (mr *MemRepo) Put(putReq *model.PutValue) error {
 
 	if (putReq.Expiry == "-1") {
 		expire = time.Now().Add(mr.defaultExpiration).UnixNano()
-	}
-
-	if (putReq.Expiry != "0" ) {
-		d,_ := strconv.Atoi(putReq.Expiry)
-		duration := time.Duration(d) * time.Second
-		expire = time.Now().Add(duration).UnixNano()
-	} 
-
+	} else if (putReq.Expiry != "0" ) {
+			d,_ := strconv.Atoi(putReq.Expiry)
+			duration := time.Duration(d) * time.Second
+			expire = time.Now().Add(duration).UnixNano()
+		} 
+	
 
 	var lItem = &item{
 		item: putReq.Value,
